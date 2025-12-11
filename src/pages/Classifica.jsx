@@ -369,6 +369,7 @@ const Classifica = () => {
 
   return (
     <div className="classifica-container">
+        <h1 style={{ textAlign: 'center' }}>Classifiche</h1>
         <div className="filters-container">
             <div className="top-row-filters">
                 <div className="year-selector-container">
