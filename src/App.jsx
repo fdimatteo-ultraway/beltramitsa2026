@@ -6,6 +6,7 @@ import Regolamento from "./pages/Regolamento";
 import Classifica from "./pages/Classifica";
 import Contatti from "./pages/Contatti";
 import Comunicati from "./pages/Comunicati";
+import Accedi from "./pages/Accedi";
 import "./App.css";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/classifica" element={<Classifica />} />
         <Route path="/contatti" element={<Contatti />} />
         <Route path="/comunicati" element={<Comunicati />} />
+        <Route path="/accedi" element={<Accedi />} />
       </Routes>
       <Footer />
     </BrowserRouter>
