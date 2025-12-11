@@ -369,93 +369,91 @@ const Classifica = () => {
 
   return (
     <div className="classifica-container">
-      <div className="filters-container">
-        <div className="year-selector-container">
-          <label htmlFor="year-select" style={{fontWeight: 'bold', color: 'black'}}>Risultati del:</label>
-          <ThemeProvider theme={theme}>
-            <FormControl>
-              <Select
-                labelId="year-select-label"
-                id="year-select"
-                value={selectedYear}
-                onChange={handleFilterChange(setSelectedYear)}
-              >
-                {years.map(year => (
-                  <MenuItem key={year} value={year}>{year}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </ThemeProvider>
-        </div>
-        <div className="sub-filters-container">
-            <div className="classifica-selector-container">
-            <label htmlFor="classifica-select" style={{color: 'black'}}>Classifica:</label>
-            <ThemeProvider theme={theme2}>
-                <FormControl>
-                <Select
-                    labelId="classifica-select-label"
-                    id="classifica-select"
-                    value={classifica}
-                    onChange={handleClassificaChange}
-                >
-                    {classifiche.map(c => (
-                    <MenuItem key={c} value={c}>{c}</MenuItem>
-                    ))}
-                </Select>
-                </FormControl>
-            </ThemeProvider>
+        <div className="filters-container">
+            <div className="top-row-filters">
+                <div className="year-selector-container">
+                    <label htmlFor="year-select" style={{fontWeight: 'bold', color: 'black'}}>Risultati del:</label>
+                    <ThemeProvider theme={theme}>
+                        <FormControl>
+                        <Select
+                            labelId="year-select-label"
+                            id="year-select"
+                            value={selectedYear}
+                            onChange={handleFilterChange(setSelectedYear)}
+                        >
+                            {years.map(year => (
+                            <MenuItem key={year} value={year}>{year}</MenuItem>
+                            ))}
+                        </Select>
+                        </FormControl>
+                    </ThemeProvider>
+                </div>
+                <div className='search-container'>
+                    <ThemeProvider theme={theme3}>
+                        <TextField 
+                            label="Cerca"
+                            variant="outlined" 
+                            value={searchTerm} 
+                            onChange={handleSearchChange}
+                            fullWidth
+                        />
+                    </ThemeProvider>
+                </div>
             </div>
-            {classifica !== 'Squadre' && (
-                <>
-                    <div className="tipo-selector-container">
-                        <label htmlFor="tipo-select" style={{color: 'black'}}>Tipo:</label>
-                        <ThemeProvider theme={theme2}>
-                            <FormControl>
-                                <Select
-                                    labelId="tipo-select-label"
-                                    id="tipo-select"
-                                    value={tipo}
-                                    onChange={handleTipoChange}
-                                >
-                                    {tipi.map(t => (
-                                        <MenuItem key={t} value={t}>{t}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </ThemeProvider>
-                    </div>
-                    <div className="categoria-selector-container">
-                        <label htmlFor="categoria-select" style={{color: 'black'}}>Categoria:</label>
-                        <ThemeProvider theme={theme2}>
-                            <FormControl>
-                                <Select
-                                    labelId="categoria-select-label"
-                                    id="categoria-select"
-                                    value={categoria}
-                                    onChange={handleFilterChange(setCategoria)}
-                                >
-                                    {tipo === 'Generali' 
-                                        ? generaliOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
-                                        : categorieOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
-                                    }
-                                </Select>
-                            </FormControl>
-                        </ThemeProvider>
-                    </div>
-                </>
-            )}
-        </div>
-        <div className='search-container'>
-            <ThemeProvider theme={theme3}>
-                <TextField 
-                    label="Cerca" 
-                    variant="outlined" 
-                    value={searchTerm} 
-                    onChange={handleSearchChange}
-                    style={{width: '50%'}}
-                />
-            </ThemeProvider>
-        </div>
+            <div className="main-filters-row">
+                <div className="filter-control">
+                    <label htmlFor="classifica-select">Classifica</label>
+                    <ThemeProvider theme={theme2}>
+                        <FormControl fullWidth>
+                            <Select
+                                labelId="classifica-select-label"
+                                id="classifica-select"
+                                value={classifica}
+                                onChange={handleClassificaChange}
+                            >
+                                {classifiche.map(c => (
+                                    <MenuItem key={c} value={c}>{c}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </ThemeProvider>
+                </div>
+                <div className="filter-control">
+                    <label htmlFor="tipo-select">Tipo</label>
+                    <ThemeProvider theme={theme2}>
+                        <FormControl fullWidth disabled={classifica === 'Squadre'}>
+                            <Select
+                                labelId="tipo-select-label"
+                                id="tipo-select"
+                                value={tipo}
+                                onChange={handleTipoChange}
+                            >
+                                {tipi.map(t => (
+                                    <MenuItem key={t} value={t}>{t}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </ThemeProvider>
+                </div>
+                <div className="filter-control">
+                    <label htmlFor="categoria-select">Categoria</label>
+                    <ThemeProvider theme={theme2}>
+                        <FormControl fullWidth disabled={classifica === 'Squadre'}>
+                            <Select
+                                labelId="categoria-select-label"
+                                id="categoria-select"
+                                value={categoria}
+                                onChange={handleFilterChange(setCategoria)}
+                            >
+                                {tipo === 'Generali' 
+                                    ? generaliOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
+                                    : categorieOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
+                                }
+                            </Select>
+                        </FormControl>
+                    </ThemeProvider>
+                </div>
+            </div>
       </div>
       <table>
         {classifica === 'Squadre' ? (
