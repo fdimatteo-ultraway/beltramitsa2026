@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, MenuItem, FormControl } from '@mui/material';
+import { Select, MenuItem, FormControl, TextField } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './Classifica.css';
 
@@ -69,6 +69,35 @@ const theme2 = createTheme({
   },
 });
 
+const theme3 = createTheme({
+    components: {
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#c2185b',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#c2185b',
+            },
+            '.MuiOutlinedInput-notchedOutline': {
+                borderColor: '#c2185b',
+            },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            '&.Mui-focused': {
+              color: '#c2185b',
+            },
+          },
+        },
+      },
+    },
+  });
+
 const generateMockData = (count) => {
   const data = [];
   const teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'];
@@ -100,67 +129,110 @@ const Classifica = () => {
   const [classifica, setClassifica] = useState('Granfondo');
   const [tipo, setTipo] = useState('Generali');
   const [categoria, setCategoria] = useState('Assolute');
+  const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const [teamRecords, setTeamRecords] = useState([]);
 
   const recordsPerPage = 20;
 
   useEffect(() => {
-    let records = initialRecords.sort((a, b) => b.punti - a.punti);
+    let finalRecords;
 
-    if (tipo === 'Generali') {
-      if (categoria === 'Maschile') {
-        records = records.filter(r => r.sex === 'M');
-      } else if (categoria === 'Femminile') {
-        records = records.filter(r => r.sex === 'F');
-      }
-    } else if (tipo === 'Categorie') {
-      records = records.filter(r => r.cat === categoria);
-    }
+    if (classifica === 'Squadre') {
+        const teamPoints = {};
+        initialRecords.forEach(record => {
+            if (!teamPoints[record.team]) {
+                teamPoints[record.team] = 0;
+            }
+            teamPoints[record.team] += record.punti;
+        });
 
-    const categoryRanks = {};
-    records.forEach(record => {
-        if (!categoryRanks[record.cat]) {
-            categoryRanks[record.cat] = [];
-        }
-        categoryRanks[record.cat].push(record);
-    });
-
-    const pCatMap = new Map();
-    for (const category in categoryRanks) {
-        categoryRanks[category]
+        const sortedTeams = Object.keys(teamPoints)
+            .map(team => ({ team, punti: teamPoints[team] }))
             .sort((a, b) => b.punti - a.punti)
-            .forEach((athlete, index) => {
-                pCatMap.set(athlete.atleta, index + 1);
-            });
+            .map((team, index) => ({ ...team, p: index + 1 }));
+        
+        finalRecords = sortedTeams;
+        if (searchTerm) {
+            finalRecords = finalRecords.filter(record => record.team.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        setTeamRecords(finalRecords);
+        setFilteredRecords([]);
+
+    } else {
+        let records = initialRecords.sort((a, b) => b.punti - a.punti);
+
+        if (tipo === 'Generali') {
+            if (categoria === 'Maschile') {
+                records = records.filter(r => r.sex === 'M');
+            } else if (categoria === 'Femminile') {
+                records = records.filter(r => r.sex === 'F');
+            }
+        } else if (tipo === 'Categorie') {
+            records = records.filter(r => r.cat === categoria);
+        }
+
+        if (searchTerm) {
+            records = records.filter(record => record.atleta.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+
+        const categoryRanks = {};
+        records.forEach(record => {
+            if (!categoryRanks[record.cat]) {
+                categoryRanks[record.cat] = [];
+            }
+            categoryRanks[record.cat].push(record);
+        });
+
+        const pCatMap = new Map();
+        for (const category in categoryRanks) {
+            categoryRanks[category]
+                .sort((a, b) => b.punti - a.punti)
+                .forEach((athlete, index) => {
+                    pCatMap.set(athlete.atleta, index + 1);
+                });
+        }
+
+        const maleAthletes = initialRecords.filter(a => a.sex === 'M').sort((a, b) => b.punti - a.punti);
+        const femaleAthletes = initialRecords.filter(a => a.sex === 'F').sort((a, b) => b.punti - a.punti);
+
+        const pSexMap = new Map();
+        maleAthletes.forEach((athlete, index) => { pSexMap.set(athlete.atleta, index + 1); });
+        femaleAthletes.forEach((athlete, index) => { pSexMap.set(athlete.atleta, index + 1); });
+
+        const allRecords = records.map((record, index) => ({
+            ...record,
+            pGen: index + 1,
+            pSex: pSexMap.get(record.atleta),
+            pCat: pCatMap.get(record.atleta)
+        }));
+
+        setFilteredRecords(allRecords);
+        setTeamRecords([]);
     }
 
-    const maleAthletes = initialRecords.filter(a => a.sex === 'M').sort((a, b) => b.punti - a.punti);
-    const femaleAthletes = initialRecords.filter(a => a.sex === 'F').sort((a, b) => b.punti - a.punti);
+  }, [selectedYear, classifica, tipo, categoria, searchTerm]);
 
-    const pSexMap = new Map();
-    maleAthletes.forEach((athlete, index) => { pSexMap.set(athlete.atleta, index + 1); });
-    femaleAthletes.forEach((athlete, index) => { pSexMap.set(athlete.atleta, index + 1); });
-
-
-    const allRecords = records.map((record, index) => ({
-        ...record,
-        pGen: index + 1,
-        pSex: pSexMap.get(record.atleta),
-        pCat: pCatMap.get(record.atleta)
-      }));
-
-    setFilteredRecords(allRecords);
-
-  }, [selectedYear, classifica, tipo, categoria]);
+  const handleClassificaChange = (e) => {
+    const newClassifica = e.target.value;
+    setClassifica(newClassifica);
+    if (newClassifica === 'Squadre') {
+      setTipo('Generali'); 
+      setCategoria('Assolute');
+    }
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
 
   const handleTipoChange = (e) => {
     const newTipo = e.target.value;
     setTipo(newTipo);
     if (newTipo === 'Generali') {
       setCategoria('Assolute');
-    } else {
+    } else if (newTipo === 'Categorie') {
       setCategoria(categorieOptions[0]);
     }
+    setSearchTerm('');
     setCurrentPage(1);
   };
 
@@ -169,15 +241,22 @@ const Classifica = () => {
       setCurrentPage(1);
   }
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  }
+
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = filteredRecords.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
+  
+  const sourceData = classifica === 'Squadre' ? teamRecords : filteredRecords;
+  const currentRecords = sourceData.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(sourceData.length / recordsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const years = [2025, 2024, 2023, 2022, 2021, 2020];
-  const classifiche = ['Granfondo', 'Mediofondo'];
+  const classifiche = ['Granfondo', 'Mediofondo', 'Squadre'];
   const tipi = ['Generali', 'Categorie'];
   const generaliOptions = ['Assolute', 'Maschile', 'Femminile'];
 
@@ -213,7 +292,7 @@ const Classifica = () => {
                     labelId="classifica-select-label"
                     id="classifica-select"
                     value={classifica}
-                    onChange={handleFilterChange(setClassifica)}
+                    onChange={handleClassificaChange}
                 >
                     {classifiche.map(c => (
                     <MenuItem key={c} value={c}>{c}</MenuItem>
@@ -222,118 +301,157 @@ const Classifica = () => {
                 </FormControl>
             </ThemeProvider>
             </div>
-            <div className="tipo-selector-container">
-            <label htmlFor="tipo-select" style={{color: 'black'}}>Tipo:</label>
-            <ThemeProvider theme={theme2}>
-                <FormControl>
-                <Select
-                    labelId="tipo-select-label"
-                    id="tipo-select"
-                    value={tipo}
-                    onChange={handleTipoChange}
-                >
-                    {tipi.map(t => (
-                    <MenuItem key={t} value={t}>{t}</MenuItem>
-                    ))}
-                </Select>
-                </FormControl>
+            {classifica !== 'Squadre' && (
+                <>
+                    <div className="tipo-selector-container">
+                        <label htmlFor="tipo-select" style={{color: 'black'}}>Tipo:</label>
+                        <ThemeProvider theme={theme2}>
+                            <FormControl>
+                                <Select
+                                    labelId="tipo-select-label"
+                                    id="tipo-select"
+                                    value={tipo}
+                                    onChange={handleTipoChange}
+                                >
+                                    {tipi.map(t => (
+                                        <MenuItem key={t} value={t}>{t}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </ThemeProvider>
+                    </div>
+                    <div className="categoria-selector-container">
+                        <label htmlFor="categoria-select" style={{color: 'black'}}>Categoria:</label>
+                        <ThemeProvider theme={theme2}>
+                            <FormControl>
+                                <Select
+                                    labelId="categoria-select-label"
+                                    id="categoria-select"
+                                    value={categoria}
+                                    onChange={handleFilterChange(setCategoria)}
+                                >
+                                    {tipo === 'Generali' 
+                                        ? generaliOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
+                                        : categorieOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
+                                    }
+                                </Select>
+                            </FormControl>
+                        </ThemeProvider>
+                    </div>
+                </>
+            )}
+        </div>
+        <div className='search-container'>
+            <ThemeProvider theme={theme3}>
+                <TextField 
+                    label="Cerca" 
+                    variant="outlined" 
+                    value={searchTerm} 
+                    onChange={handleSearchChange}
+                    style={{width: '50%'}}
+                />
             </ThemeProvider>
-            </div>
-            <div className="categoria-selector-container">
-            <label htmlFor="categoria-select" style={{color: 'black'}}>Categoria:</label>
-            <ThemeProvider theme={theme2}>
-                <FormControl>
-                <Select
-                    labelId="categoria-select-label"
-                    id="categoria-select"
-                    value={categoria}
-                    onChange={handleFilterChange(setCategoria)}
-                >
-                    {tipo === 'Generali' 
-                        ? generaliOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
-                        : categorieOptions.map(o => <MenuItem key={o} value={o}>{o}</MenuItem>)
-                    }
-                </Select>
-                </FormControl>
-            </ThemeProvider>
-            </div>
         </div>
       </div>
       <table>
-        <thead>
-          <tr>
-            {showCatFirst ? (
+        {classifica === 'Squadre' ? (
+            <thead>
+                <tr>
+                    <th>P</th>
+                    <th>Team</th>
+                    <th>Punti</th>
+                    <th></th>
+                </tr>
+            </thead>
+        ) : (
+            <thead>
+            <tr>
+                {showCatFirst ? (
+                    <>
+                        <th>Cat</th>
+                        <th>Atleta</th>
+                        <th>Team</th>
+                        <th>Sex</th>
+                        <th>P. Sex</th>
+                        <th>P. Gen</th>
+                        <th>Punti</th>
+                    </>
+                ) : showPSexFirst ? (
                 <>
+                    <th>P. Sex</th>
+                    <th>Atleta</th>
+                    <th>Team</th>
+                    <th>Sex</th>
+                    <th>P. Gen</th>
                     <th>Cat</th>
+                    <th>Punti</th>
+                </>
+                ) : (
+                <>
+                    <th>P. Gen</th>
                     <th>Atleta</th>
                     <th>Team</th>
                     <th>Sex</th>
                     <th>P. Sex</th>
-                    <th>P. Gen</th>
+                    <th>Cat</th>
                     <th>Punti</th>
                 </>
-            ) : showPSexFirst ? (
-              <>
-                <th>P. Sex</th>
-                <th>Atleta</th>
-                <th>Team</th>
-                <th>Sex</th>
-                <th>P. Gen</th>
-                <th>Cat</th>
-                <th>Punti</th>
-              </>
-            ) : (
-              <>
-                <th>P. Gen</th>
-                <th>Atleta</th>
-                <th>Team</th>
-                <th>Sex</th>
-                <th>P. Sex</th>
-                <th>Cat</th>
-                <th>Punti</th>
-              </>
-            )}
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentRecords.map((record) => (
-            <tr key={record.atleta}>
-                {showCatFirst ? (
+                )}
+                <th></th>
+            </tr>
+            </thead>
+        )}
+        {classifica === 'Squadre' ? (
+            <tbody>
+                {currentRecords.map((record) => (
+                    <tr key={record.team}>
+                        <td>{record.p}</td>
+                        <td>{record.team}</td>
+                        <td>{record.punti}</td>
+                        <td><button className="details-button">Dettagli</button></td>
+                    </tr>
+                ))}
+            </tbody>
+        ) : (
+            <tbody>
+            {currentRecords.map((record) => (
+                <tr key={record.atleta}>
+                    {showCatFirst ? (
+                        <>
+                            <td style={{ fontSize: 'small', textAlign: 'center' }}>{record.cat}<br/>{record.pCat}</td>
+                            <td>{record.atleta}</td>
+                            <td>{record.team}</td>
+                            <td>{record.sex}</td>
+                            <td>{record.pSex}</td>
+                            <td>{record.pGen}</td>
+                            <td>{record.punti}</td>
+                        </>
+                    ) : showPSexFirst ? (
                     <>
+                        <td>{record.pSex}</td>
+                        <td>{record.atleta}</td>
+                        <td>{record.team}</td>
+                        <td>{record.sex}</td>
+                        <td>{record.pGen}</td>
                         <td style={{ fontSize: 'small', textAlign: 'center' }}>{record.cat}<br/>{record.pCat}</td>
+                        <td>{record.punti}</td>
+                    </>
+                    ) : (
+                    <>
+                        <td>{record.pGen}</td>
                         <td>{record.atleta}</td>
                         <td>{record.team}</td>
                         <td>{record.sex}</td>
                         <td>{record.pSex}</td>
-                        <td>{record.pGen}</td>
+                        <td style={{ fontSize: 'small', textAlign: 'center' }}>{record.cat}<br/>{record.pCat}</td>
                         <td>{record.punti}</td>
                     </>
-                ) : showPSexFirst ? (
-                <>
-                    <td>{record.pSex}</td>
-                    <td>{record.atleta}</td>
-                    <td>{record.team}</td>
-                    <td>{record.sex}</td>
-                    <td>{record.pGen}</td>
-                    <td style={{ fontSize: 'small', textAlign: 'center' }}>{record.cat}<br/>{record.pCat}</td>
-                    <td>{record.punti}</td>
-                </>
-                ) : (
-                <>
-                    <td>{record.pGen}</td>
-                    <td>{record.atleta}</td>
-                    <td>{record.team}</td>
-                    <td>{record.sex}</td>
-                    <td>{record.pSex}</td>
-                    <td style={{ fontSize: 'small', textAlign: 'center' }}>{record.cat}<br/>{record.pCat}</td>
-                    <td>{record.punti}</td>
-                </>
-                )}
-                <td><button className="details-button">Dettagli</button></td>
-            </tr>
-          ))}
-        </tbody>
+                    )}
+                    <td><button className="details-button">Dettagli</button></td>
+                </tr>
+            ))}
+            </tbody>
+        )}
       </table>
       <div className="pagination">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
