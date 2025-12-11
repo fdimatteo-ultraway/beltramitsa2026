@@ -1,68 +1,230 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    color: #333;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Hero Slider Styles */
+.hero-slider {
+    position: relative;
+    height: 70vh; /* Set the desired height for the slider container */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
+/* The overlay remains the same */
+.hero-overlay-new {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    border-radius: 10px;
+    z-index: 10; /* Ensure overlay is above the slides */
+}
+
+.hero-overlay-new h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.cta-button {
+    background-color: #e91e63;
+    color: white;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #c2185b;
+}
+
+
+/* Events Section */
+.events {
+    padding: 40px 20px;
+    background-color: white;
+    margin-top: -80px;
+    position: relative;
+    z-index: 10;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.events h2 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+}
+
+.events-grid,
+.blog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+    .events-grid,
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .events-grid,
+    .blog-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.event-card {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.event-card-content {
+    padding: 20px;
+}
+
+.event-card-content h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+.event-card-content p {
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.event-date {
+    font-weight: bold;
+    color: #e91e63;
+}
+
+.event-card-actions {
+    padding: 10px 20px;
     background-color: #f9f9f9;
-  }
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-detail,
+.btn-subscribe {
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-detail {
+    background-color: transparent;
+    border: 1px solid #e91e63;
+    color: #e91e63;
+}
+
+.btn-detail:hover {
+    background-color: #e91e63;
+    color: white;
+}
+
+.btn-subscribe {
+    background-color: #e91e63;
+    color: white;
+    border: 1px solid #e91e63;
+}
+
+.btn-subscribe:hover {
+    background-color: #c2185b;
+    border-color: #c2185b;
+}
+
+/* Training Partner Section */
+.training-partner {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+}
+
+.training-partner h3 {
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.training-partner-logo {
+    max-width: 250px;
+    height: auto;
+}
+
+/* Blog Section */
+.blog {
+    padding: 40px 20px;
+    background-color: #fff;
+}
+
+.blog h2 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+}
+
+.blog-post {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-post-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.blog-post-content {
+    padding: 20px;
+}
+
+.blog-post-content h3 {
+    font-size: 1.3em;
+    margin-top: 0;
+}
+
+.blog-post-content p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.blog-post-content a {
+    color: #e91e63;
+    text-decoration: none;
+    font-weight: bold;
 }

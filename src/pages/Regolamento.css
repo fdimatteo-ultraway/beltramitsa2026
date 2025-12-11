@@ -1,0 +1,41 @@
+.regolamento-container {
+  padding: 2rem;
+  font-family: sans-serif;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.regolamento-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.regolamento-container h2 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.regolamento-container h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.regolamento-container p {
+  margin-bottom: 1rem;
+}
+
+.regolamento-container ul {
+  list-style-type: disc;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.regolamento-container li {
+  margin-bottom: 0.5rem;
+}
