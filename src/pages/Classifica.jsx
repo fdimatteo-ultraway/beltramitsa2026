@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Select, MenuItem, FormControl, TextField } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import DettagliAtletaModal from '../components/DettagliAtletaModal';
+import DettagliSquadraModal from '../components/DettagliSquadraModal';
 import './Classifica.css';
 
 const theme = createTheme({
@@ -98,27 +100,51 @@ const theme3 = createTheme({
     },
   });
 
-const generateMockData = (count) => {
-  const data = [];
-  const teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'];
-  const femaleCategories = ['WA', 'WB', 'WC', 'WD'];
-  const maleCategories = ['ELMT', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8'];
-
-  for (let i = 1; i <= count; i++) {
-    const sex = Math.random() > 0.3 ? 'M' : 'F';
-    const categories = sex === 'F' ? femaleCategories : maleCategories;
-    const cat = categories[Math.floor(Math.random() * categories.length)];
-
-    data.push({
-      atleta: `Atleta ${i}`,
-      team: teams[Math.floor(Math.random() * teams.length)],
-      sex: sex,
-      cat: cat,
-      punti: Math.floor(Math.random() * 2000) + 500,
-    });
-  }
-  return data;
-};
+  const generateMockData = (count) => {
+    const data = [];
+    const teams = ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'];
+    const femaleCategories = ['WA', 'WB', 'WC', 'WD'];
+    const maleCategories = ['ELMT', 'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8'];
+    const eventNames = [
+        "Granfondo del Po",
+        "Via del sale",
+        "Granfondo Città di Valdagno",
+        "Granfondo città di San Benedetto",
+        "Granfondo Squali",
+        "Marcialonga Craft",
+        "Granfondo Città di Livorno",
+        "Matildica"
+    ];
+  
+    for (let i = 1; i <= count; i++) {
+      const sex = Math.random() > 0.3 ? 'M' : 'F';
+      const categories = sex === 'F' ? femaleCategories : maleCategories;
+      const cat = categories[Math.floor(Math.random() * categories.length)];
+  
+      const eventi = [];
+      let puntiTotali = 0;
+      const eventiValidi = Math.floor(Math.random() * 5) + 4; 
+      for (let j = 0; j < 8; j++) {
+        if (j < eventiValidi) {
+          const puntiEvento = Math.floor(Math.random() * 300) + 50;
+          eventi.push({ nome: eventNames[j], punti: puntiEvento });
+          puntiTotali += puntiEvento;
+        } else {
+          eventi.push({ nome: eventNames[j], punti: 0 });
+        }
+      }
+  
+      data.push({
+        atleta: `Atleta ${i}`,
+        team: teams[Math.floor(Math.random() * teams.length)],
+        sex: sex,
+        cat: cat,
+        punti: puntiTotali,
+        eventi: eventi,
+      });
+    }
+    return data;
+  };
 
 const initialRecords = generateMockData(100);
 const categorieOptions = [...new Set(initialRecords.map(item => item.cat))].sort();
@@ -132,6 +158,10 @@ const Classifica = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [teamRecords, setTeamRecords] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAthlete, setSelectedAthlete] = useState(null);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(null);
 
   const recordsPerPage = 20;
 
@@ -212,6 +242,80 @@ const Classifica = () => {
     }
 
   }, [selectedYear, classifica, tipo, categoria, searchTerm]);
+
+  const handleOpenModal = (atleta) => {
+    setSelectedAthlete(atleta);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAthlete(null);
+  };
+
+  const handleOpenTeamModal = (team) => {
+    const atletiDelTeam = initialRecords.filter(atleta => atleta.team === team.team);
+    const eventiPunti = {};
+    const atletiPerEvento = {};
+
+    atletiDelTeam.forEach(atleta => {
+        atleta.eventi.forEach(evento => {
+            if (!eventiPunti[evento.nome]) {
+                eventiPunti[evento.nome] = 0;
+                atletiPerEvento[evento.nome] = 0;
+            }
+            eventiPunti[evento.nome] += evento.punti;
+            if (evento.punti > 0) {
+                atletiPerEvento[evento.nome] += 1;
+            }
+        });
+    });
+
+    const puntiPerEventoPerTeam = {};
+    initialRecords.forEach(atleta => {
+        atleta.eventi.forEach(evento => {
+            if (evento.punti > 0) {
+                if (!puntiPerEventoPerTeam[evento.nome]) {
+                    puntiPerEventoPerTeam[evento.nome] = {};
+                }
+                if (!puntiPerEventoPerTeam[evento.nome][atleta.team]) {
+                    puntiPerEventoPerTeam[evento.nome][atleta.team] = 0;
+                }
+                puntiPerEventoPerTeam[evento.nome][atleta.team] += evento.punti;
+            }
+        });
+    });
+
+    const rankingPerEvento = {};
+    for (const evento in puntiPerEventoPerTeam) {
+        const sortedTeams = Object.keys(puntiPerEventoPerTeam[evento])
+            .sort((a, b) => puntiPerEventoPerTeam[evento][b] - puntiPerEventoPerTeam[evento][a]);
+        rankingPerEvento[evento] = sortedTeams;
+    }
+
+    const eventiArray = Object.keys(eventiPunti).map(nome => ({
+        nome,
+        punti: eventiPunti[nome],
+        numeroAtleti: atletiPerEvento[nome],
+        posizione: rankingPerEvento[nome] ? rankingPerEvento[nome].indexOf(team.team) + 1 : 'N/A'
+    }));
+
+    const squadraCompleta = {
+        nome: team.team,
+        punti: team.punti,
+        posizione: team.p,
+        numeroAtleti: atletiDelTeam.length,
+        eventi: eventiArray,
+    };
+
+    setSelectedTeam(squadraCompleta);
+    setIsTeamModalOpen(true);
+  };
+
+  const handleCloseTeamModal = () => {
+      setIsTeamModalOpen(false);
+      setSelectedTeam(null);
+  };
 
   const handleClassificaChange = (e) => {
     const newClassifica = e.target.value;
@@ -408,7 +512,7 @@ const Classifica = () => {
                         <td>{record.p}</td>
                         <td>{record.team}</td>
                         <td>{record.punti}</td>
-                        <td><button className="details-button">Dettagli</button></td>
+                        <td><button className="details-button" onClick={() => handleOpenTeamModal(record)}>Dettagli</button></td>
                     </tr>
                 ))}
             </tbody>
@@ -447,7 +551,7 @@ const Classifica = () => {
                         <td>{record.punti}</td>
                     </>
                     )}
-                    <td><button className="details-button">Dettagli</button></td>
+                    <td><button className="details-button" onClick={() => handleOpenModal(record)}>Dettagli</button></td>
                 </tr>
             ))}
             </tbody>
@@ -464,6 +568,12 @@ const Classifica = () => {
           </button>
         ))}
       </div>
+      {isModalOpen && selectedAthlete && (
+        <DettagliAtletaModal atleta={selectedAthlete} onClose={handleCloseModal} />
+      )}
+      {isTeamModalOpen && selectedTeam && (
+        <DettagliSquadraModal squadra={selectedTeam} onClose={handleCloseTeamModal} />
+      )}
     </div>
   );
 };
