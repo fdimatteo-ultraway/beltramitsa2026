@@ -12,39 +12,6 @@
   font-weight: 300;
 }
 
-.year-selector-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-}
-
-.year-selector-container label {
-  font-weight: bold;
-  color: #000;
-}
-
-.year-selector-container select {
-  background-color: #c2185b;
-  color: white;
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%23ffffff%22/%3E%3C/svg%3E');
-  background-repeat: no-repeat;
-  background-position: right 0.7em top 50%;
-  background-size: 0.65em auto;
-  padding-right: 2.5em; /* Make space for the arrow */
-}
-
-.year-selector-container select::-ms-expand {
-  display: none; /* For IE to remove the default arrow */
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -109,4 +76,32 @@ tbody tr:hover {
   background-color: #c2185b;
   color: white;
   border-color: #c2185b;
+}
+
+.year-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.sub-filters-container {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.classifica-selector-container,
+.tipo-selector-container,
+.categoria-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
