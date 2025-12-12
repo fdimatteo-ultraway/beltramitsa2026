@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import CustomSlider from '../components/CustomSlider'; // Import the new custom slider
 import ultrawayLogo from '../assets/images/Ultraway_positivo_1920x1080.png';
+import fciLogo from '../assets/Logo_FCI_2023.png';
+import dammiUnMetroLogo from '../assets/LOGO-DAMMI-UN-METRO-DI-VU-VITA-1.png';
+import ciclocircuitiLogo from '../assets/images/Ciclocircuiti.png';
+import logo2026 from '../assets/images/LOGO_2026.png';
 
 const Home = () => {
 
@@ -82,8 +86,20 @@ const Home = () => {
       </section>
 
       <section className="training-partner">
-        <h3>Training Partner</h3>
-        <img src={ultrawayLogo} alt="Ultraway Logo" className="training-partner-logo" />
+        <h3>Our Partner</h3>
+        <div className="partner-logos">
+          <div className="logo-row">
+            <img src={ultrawayLogo} alt="Ultraway Logo" className="partner-logo" />
+            <img src={fciLogo} alt="FCI Logo" className="partner-logo" />
+            <img src={dammiUnMetroLogo} alt="Dammi un metro di vita Logo" className="partner-logo" />
+          </div>
+          <div className="logo-row">
+            <img src={ciclocircuitiLogo} alt="Ciclocircuiti Logo" className="partner-logo" />
+            <img src={logo2026} alt="Logo 2026" className="partner-logo" />
+            <img src={fciLogo} alt="FCI Logo" className="partner-logo" />
+            <img src={dammiUnMetroLogo} alt="Dammi un metro di vita Logo" className="partner-logo" />
+          </div>
+        </div>
       </section>
 
       <section className="blog">

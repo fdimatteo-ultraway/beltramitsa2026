@@ -259,7 +259,7 @@ footer {
 
 .training-partner {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 1rem 2rem;
   background-color: #F4F7FA;
 }
 
@@ -269,10 +269,33 @@ footer {
     color: var(--text-medium);
 }
 
-.training-partner-logo {
-  max-width: 1200px;
-  height: auto;
+.partner-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
 }
+
+.logo-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+.partner-logo {
+  height: 80px;
+  max-width: 200px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.partner-logo:hover {
+  filter: grayscale(0%);
+}
+
 
 
 /* Events & Blog */
